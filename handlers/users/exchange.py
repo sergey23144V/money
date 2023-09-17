@@ -6,12 +6,11 @@ from aiogram.types import ContentType
 from datetime import datetime
 from data.config import ADMINS
 
-from handlers.users.mechanic import money_for_grades, menu
+from handlers.users.mechanic import money_for_grades, menu, mesAdminScope
 
 from loader import dp, bot
 from states.ClassUser import User
 
-score = 0
 
 
 @dp.callback_query_handler(text="exchange")
@@ -54,9 +53,8 @@ async def score(call: types.CallbackQuery):
 
 @dp.callback_query_handler(text="score1")
 async def score1(call: types.CallbackQuery, state: FSMContext):
-    global score
     score = 1
-
+    await state.update_data(score=score)
     await mes(call)
     await money_for_grades(500, state=state)
     await User.photo.set()
@@ -64,9 +62,8 @@ async def score1(call: types.CallbackQuery, state: FSMContext):
 
 @dp.callback_query_handler(text="score2")
 async def score2(call: types.CallbackQuery, state: FSMContext):
-    global score
     score = 2
-
+    await state.update_data(score=score)
     await mes(call)
     await money_for_grades(750, state=state)
     await User.photo.set()
@@ -74,9 +71,8 @@ async def score2(call: types.CallbackQuery, state: FSMContext):
 
 @dp.callback_query_handler(text="score3")
 async def score3(call: types.CallbackQuery, state: FSMContext):
-    global score
     score = 3
-
+    await state.update_data(score=score)
     await mes(call)
     await money_for_grades(1000, state=state)
     await User.photo.set()
@@ -84,9 +80,9 @@ async def score3(call: types.CallbackQuery, state: FSMContext):
 
 @dp.callback_query_handler(text="score4")
 async def score4(call: types.CallbackQuery, state: FSMContext):
-    global score
-    score = 4
 
+    score = 4
+    await state.update_data(score=score)
     await mes(call)
     await money_for_grades(1250, state=state)
     await User.photo.set()
@@ -94,9 +90,8 @@ async def score4(call: types.CallbackQuery, state: FSMContext):
 
 @dp.callback_query_handler(text="score5")
 async def score5(call: types.CallbackQuery, state: FSMContext):
-    global score
     score = 5
-
+    await state.update_data(score=score)
     await mes(call)
     await money_for_grades(1500, state=state)
     await User.photo.set()
@@ -104,18 +99,16 @@ async def score5(call: types.CallbackQuery, state: FSMContext):
 
 @dp.message_handler(state=User.photo, content_types=ContentType.PHOTO)
 async def photo(message: types.Message, state: FSMContext):
-        global score
-        now = datetime.now()
+
+
         photo = message.photo[-1].file_id
 
         data = await state.get_data()
         score_user = data.get('user_score')
-        email = data.get('user_email')
-
+        score = data.get("score")
+        await mesAdminScope(message,state,photo,score)
         await state.update_data(photo=photo)
-        await bot.send_photo(chat_id=ADMINS,
-                             photo=photo,
-                             caption=f'{message.from_user.id}\nНовая оценка пользователя @{message.from_user.username}\n{email}\n{now.strftime("%d-%m-%Y %H:%M")}\nОценка: {score}\n')
+
         await bot.send_message(chat_id=message.chat.id,text=
                              f'@{message.from_user.username}, это фантастика! Твой кошелек пополнен! \nТвой баланс {score_user} монеты Сократа! '
                                      'Повтори процедуру, чтобы обменять еще оценки! ')

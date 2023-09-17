@@ -3,7 +3,7 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 
 from data.config import ADMINS
-from handlers.users.mechanic import menu, money_for_grades
+from handlers.users.mechanic import menu, money_for_grades, mesAdmin, GetToken
 from loader import dp, bot
 from states.ClassUser import User
 
@@ -56,7 +56,7 @@ async def settings(call: types.CallbackQuery,state: FSMContext):
 
     data = await state.get_data()
     email = data.get('user_email')
-    await bot.send_message(ADMINS, f"Пользователь {email} перешел в настройки")
+    await mesAdmin( f"Пользователь {email} перешел в настройки", state)
 
 
 @dp.callback_query_handler(text="city")
@@ -73,7 +73,7 @@ async def user_city(message: types.Message, state: FSMContext):
         await money_for_grades(1000, state=state)
         data = await state.get_data()
         email = data.get('user_email')
-        await bot.send_message(ADMINS, f"Пользователь {email} заполнил Город (+🟡1000)")
+        await mesAdmin(f"Пользователь {email} заполнил Город (+🟡1000)", state)
         await menu(message, state)
 
 
@@ -117,7 +117,7 @@ async def name_user(message: types.Message, state: FSMContext):
         url_user = f"https://api.sokratapp.ru/api/user_me"
 
         data = await state.get_data()
-        user_token = data.get('token')
+        user_token = await GetToken(state)
         last_name = data.get('user_last_name')
         first_name = data.get('user_name')
         middle_name = data.get('user_middle_name')
@@ -135,7 +135,7 @@ async def name_user(message: types.Message, state: FSMContext):
         await state.update_data(user_name=name)
         data = await state.get_data()
         email = data.get('user_email')
-        await bot.send_message(ADMINS, f"Пользователь {email} заполнил ФИО (+🟡1000)")
+        await mesAdmin( f"Пользователь {email} заполнил ФИО (+🟡1000)",state)
 
         await menu(message, state)
 
@@ -166,7 +166,7 @@ async def user_school(message: types.Message, state: FSMContext):
     await money_for_grades(1000, state=state)
     data = await state.get_data()
     email = data.get('user_email')
-    await bot.send_message(ADMINS, f"Пользователь {email} заполнил школу (+🟡1000)")
+    await mesAdmin(f"Пользователь {email} заполнил школу (+🟡1000)", state)
     await menu(message, state)
 
 
@@ -185,7 +185,7 @@ async def user_class(message: types.Message, state: FSMContext):
 
     data = await state.get_data()
     email = data.get('user_email')
-    await bot.send_message(ADMINS, f"Пользователь {email} заполнил класс (+🟡1000)")
+    await mesAdmin( f"Пользователь {email} заполнил класс (+🟡1000)", state)
     await menu(message, state)
 
 
@@ -204,7 +204,7 @@ async def user_choice(message: types.Message, state: FSMContext):
 
     data = await state.get_data()
     email = data.get('user_email')
-    await bot.send_message(ADMINS, f"Пользователь {email} заполнил желаемого завидения  (+🟡2000)")
+    await mesAdmin( f"Пользователь {email} заполнил желаемого завидения  (+🟡2000)", state)
     await menu(message, state)
 
 
@@ -220,7 +220,7 @@ async def user_choice(message: types.Message, state: FSMContext):
     url_user = f"https://api.sokratapp.ru/api/user_me"
 
     data = await state.get_data()
-    user_token = data.get('token')
+    user_token = await GetToken(state)
 
     headers = {'Authorization': f'Token {user_token}'}
 
@@ -235,7 +235,7 @@ async def user_choice(message: types.Message, state: FSMContext):
         await state.reset_state(with_data=False)
         await money_for_grades(2000, state=state)
         email = data.get('user_email')
-        await bot.send_message(ADMINS, f"Пользователь {email} заполнил телефон  (+🟡2000)")
+        await mesAdmin( f"Пользователь {email} заполнил телефон  (+🟡2000)", state)
         await menu(message, state)
     else:
         await message.answer('Неправильно введен номер!\nВведите его повторно')

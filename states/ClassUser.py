@@ -20,3 +20,4 @@ class User(StatesGroup):
     new_user = State()
     univ = State()
     id = State()
+    score = State()

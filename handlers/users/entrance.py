@@ -5,7 +5,7 @@ from aiogram.dispatcher import FSMContext
 from telebot.callback_data import CallbackData
 from states.ClassUser import User
 from data.config import ADMINS
-from handlers.users.mechanic import menu
+from handlers.users.mechanic import menu, mesAdmin
 from handlers.users.start import user_username
 from loader import dp, bot
 
@@ -30,7 +30,7 @@ async def entrance(call: types.CallbackQuery, state: FSMContext):
                          reply_markup=keyboard)
     data = await state.get_data()
     email = data.get('user_email')
-    await bot.send_message(ADMINS, f"Пользователь {email} перешел в онлайн поступления")
+    await mesAdmin("перешел в онлайн поступления",state)
 
 
 @dp.callback_query_handler(text="UNIVERSITY")
@@ -64,7 +64,7 @@ async def application(call: types.CallbackQuery,state: FSMContext):
     id_tg = await get_id_tg(id)
     univ = data.get('univ')
 
-    await bot.send_message(ADMINS, f"Пользователь {email} хочет поступить в ваше заведение {univ}")
+    await mesAdmin(f"хочет поступить в ваше заведение {univ}",state)
     await bot.send_message(call.message.chat.id, f"Заявка отправлина ожидайте ответа!!!")
 
     await menu(message=call.message, state=state)
@@ -72,7 +72,7 @@ async def application(call: types.CallbackQuery,state: FSMContext):
 
 
 async def get_unev(keyboard, listUniv, txt):
-    url = 'https://api.sokratapp.ru/study_partners/'
+    url = 'https://api.sokratapp.ru/api/study_partners/'
 
     r = requests.get(url=url)
 
@@ -90,7 +90,7 @@ async def get_unev(keyboard, listUniv, txt):
 
 
 async def get_id_tg(id):
-    url = f'https://api.sokratapp.ru/study_partners/{id}'
+    url = f'https://api.sokratapp.ru/api/study_partners/{id}'
 
     r = requests.get(url=url)
 
@@ -100,7 +100,7 @@ async def get_id_tg(id):
 
 
 async def get_description(message: types.Message, id):
-    url = f'https://api.sokratapp.ru/study_partners/{id}'
+    url = f'https://api.sokratapp.ru/api/study_partners/{id}'
 
     r = requests.get(url=url)
 

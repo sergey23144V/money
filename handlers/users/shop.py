@@ -15,7 +15,7 @@ from loader import dp, bot
 #
 
 
-def Shop():
+async def Shop():
    keyboard = types.InlineKeyboardMarkup()
 
    keyboard.add(types.InlineKeyboardButton(text="Розыгрышь", callback_data="entrance"),)
@@ -26,7 +26,15 @@ def Shop():
    return keyboard
 
 
+async def Back():
+   keyboard = types.InlineKeyboardMarkup()
+
+   keyboard.add(types.InlineKeyboardButton('Назад', callback_data="menu"))
+
+   return keyboard
 
 @dp.callback_query_handler(text="shop")
 async def settings(call: types.CallbackQuery):
-   await bot.send_message(call.message.chat.id, 'Привет, я бот для проверки телеграмм webapps!)',reply_markup=Shop())
+   keyboard = await Back()
+   # await bot.send_message(call.message.chat.id, 'Привет, я бот для проверки телеграмм webapps!)',reply_markup=Shop())
+   await bot.send_message(call.message.chat.id, 'Прошу прощения, пока эта функция на доработке',reply_markup= keyboard)
